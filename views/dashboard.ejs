@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang"en">
+    <head>
+     <meta charset="UTF-8">
+	 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+     <title>Dashboard</title> 
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  
+
+	<meta http-equiv="Content-Language"content="en">
+	
+	<style>
+	
+	    .card-stl{
+		    width:30%; 
+			padding: 2%;
+		}
+		.img-style{
+		    width:110px;
+			height: 100%;
+		}
+	</style>
+    </head>
+   
+    <body>
+	
+    
+        <script>
+		
+	function updateValues(){
+		$.ajax({
+	url: '/api/lastreadings',
+	method: 'get',
+	dataType: 'json',
+	data: {},
+	success: function(data){
+		
+		values = data["data"];
+		for (i=0;i < values.length; i++){
+		    if (values[i]["id_sensors"] == "1" && values[i]["id_typevalue"] == "2"){
+			      $("#temp-value").text(values[i]["data"]  + "C*");
+				  $("#temp-upd-date").text("Last updated " + values[i]["date_time"]);
+			}else if (values[i]["id_sensors"] == "1" && values[i]["id_typevalue"] == "3"){
+			      $("#hum-value").text(values[i]["data"]  + "%");
+		          $("#hum-upd-date").text("Last updated " + values[i]["date_time"]);
+				  }
+		    else if (values[i]["id_sensors"] == "2" && values[i]["id_typevalue"] == "4"){
+				  $("#lum-value").text(values[i]["data"]  + "E");
+		          $("#lum-upd-date").text("Last updated " + values[i]["date_time"]);
+			}
+			else if(values[i]["id_sensors"] == "3" && values[i]["id_typevalue"] == "2"){
+				  $("#soil-temp-value-1").text(values[i]["data"] + "C*");	
+		          $("#soil-temp-1-upd-date").text("Last updated " + values[i]["date_time"]);				  
+			}
+			else if(values[i]["id_sensors"] == "4" && values[i]["id_typevalue"] == "2"){
+				  $("#soil-temp-value-2").text(values[i]["data"]  + "C*");	
+		          $("#soil-temp-2-upd-date").text("Last updated " + values[i]["date_time"]);				  
+			}
+			else if(values[i]["id_sensors"] == "5" && values[i]["id_typevalue"] == "3"){
+				  $("#soil-hum-value-1").text(values[i]["data"] + "%");	
+		          $("#soil-hum-1-upd-date").text("Last updated " + values[i]["date_time"]);				  
+			}
+			else if(values[i]["id_sensors"] == "6" && values[i]["id_typevalue"] == "3"){
+				  $("#soil-hum-value-2").text(values[i]["data"]  + "%");	
+		          $("#soil-hum-2-upd-date").text("Last updated " + values[i]["date_time"]);				  
+			}
+			
+		}
+		//$("#temp-value").text('Test message here');
+
+	 }
+     });
+	 }
+
+	 function updateDeviceStatuses(){
+		$.ajax({
+	url: '/api/getdevicestatus',
+	method: 'get',
+	dataType: 'json',
+	data: {},
+	success: function(data){
+		
+		values = data["data"];
+		for (i=0;i < values.length; i++){
+		    if (values[i]["sensor_id"]){
+				if (values[i]["value"] == "1"){
+					$("#device-"+values[i]["sensor_id"]+"-s").text("Status: ON");
+					$("#device-"+values[i]["sensor_id"]+"").text("OFF");
+					$("#device-"+values[i]["sensor_id"]+"").removeClass("btn-success");
+					$("#device-"+values[i]["sensor_id"]+"").addClass("btn-danger");
+				}else{
+                    $("#device-"+values[i]["sensor_id"]+"-s").text("Status: OFF");
+					$("#device-"+values[i]["sensor_id"]+"").text("ON");
+					$("#device-"+values[i]["sensor_id"]+"").removeClass("btn-danger");
+					$("#device-"+values[i]["sensor_id"]+"").addClass("btn-success");
+				}
+			}	
+		}
+	 }
+     });
+	 }
+
+	 function updateGreenhouseStatus(){
+		$.ajax({
+	url: '/api/getgreenhousestatus',
+	method: 'get',
+	dataType: 'json',
+	data: {},
+	success: function(data){
+		
+		values = data["value"];
+		if (values == '0'){
+            $("#warning-msg").text("Greenhouse is currently offline more than 6 minutes!");
+			$("#warning-msg").addClass("btn");
+			$("#warning-msg").addClass("w-50");
+			$("#warning-msg").addClass("btn-danger");
+		}else if (values == '1'){
+			$("#warning-msg").text("");
+			$("#warning-msg").removeClass("btn");
+			$("#warning-msg").removeClass("btn-danger");
+
+		}
+	 }
+     });
+	 }
+		</script>
+		
+		
+	<div class="card">
+	<ul class="nav nav-pills nav-fill">
+      <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/dashboard">Dashboard</a>
+      </li>
+	<!--<li class="nav-item">
+         <a class="nav-link" href="/settings">Settings</a>
+       </li>
+       <li class="nav-item">-->
+         <a class="nav-link" id="user_logout" href="">Log out</a>
+      </li>
+	  <!--
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+      </li>
+	  -->
+         </ul>
+	</div>
+
+	    <div id="warning-msg" style="margin-left: 22%;margin-top: 1%;"></div>
+
+	<div class="card" style="margin:3%;">
+	<div class="row" style="margin: auto;padding-top: 50px;width:90%;">
+	
+	  <!-- Temperature card -->
+	  <div class="col-sm-12 card-stl">
+		<div class="card bg-light text-dark">
+		  <div class="row g-0">
+			<div class="col-md-4">
+			  <img src="/images/temperature.jpg" class="img-style">
+			</div>
+			<div class="col-md-8">
+			  <div class="card-body">
+			  
+	            <!-- card dropdown -->
+				
+			    <div class="dropdown" style="position:absolute;right:0;top:0;">
+				  <a class="btn btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  </a>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="/grafik">Last 7 days</a>
+					<a class="dropdown-item" href="#">Last 30 days</a>
+					<a class="dropdown-item" href="#">Last 90 days</a>
+					<a class="dropdown-item" href="#">Sensor info</a>
+				  </div>
+				</div>
+				
+                <!-- -->
+				
+				<h5 class="card-title">Temperature</h5>
+				<p id="temp-value" class="card-text">Unknown</p>
+				<p class="card-text"><small id="temp-upd-date" class="text-muted">Last updated never</small></p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+      </div>
+	  <!-- -->
+		
+	  <!-- Humidity card -->
+	  <div class="col-sm-12 card-stl">
+		<div class="card bg-info text-dark">
+		  <div class="row g-0">
+			<div class="col-md-4">
+			  <img src="/images/humidity.jpg" class="img-style">
+			</div>
+			<div class="col-md-8">
+			  <div class="card-body">
+			  <!-- card dropdown -->
+			  
+			  <div class="dropdown" style="position:absolute;right:0;top:0;">
+				  <a class="btn btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  </a>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="#">Last 7 days</a>
+					<a class="dropdown-item" href="#">Last 30 days</a>
+					<a class="dropdown-item" href="#">Last 90 days</a>
+					<a class="dropdown-item" href="#">Sensor info</a>
+				  </div>
+				</div>
+				
+			  <!-- -->
+				<h5 class="card-title">Humidity</h5>
+				<p id="hum-value" class="card-text">Unknown</p>
+				<p class="card-text"><small id="hum-upd-date" class="text-muted">Last updated never</small></p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  <!-- -->
+		
+	  <!-- Luminosity card -->
+	  <div class="col-sm-12 card-stl">
+		<div class="card bg-warning text-dark">
+		  <div class="row g-0">
+			<div class="col-md-4">
+			  <img src="/images/luminosity.jpg" class="img-style">
+			</div>
+			<div class="col-md-8">
+			  <div class="card-body">
+			  <!-- card dropdown -->
+			  
+			  <div class="dropdown" style="position:absolute;right:0;top:0;">
+				  <a class="btn btn-warning dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  </a>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="#">Last 7 days</a>
+					<a class="dropdown-item" href="#">Last 30 days</a>
+					<a class="dropdown-item" href="#">Last 90 days</a>
+					<a class="dropdown-item" href="#">Sensor info</a>
+				  </div>
+				</div>
+			  
+			  <!-- -->
+				<h5 class="card-title">Luminosity</h5>
+				<p id="lum-value" class="card-text">Unknown</p>
+				<p class="card-text"><small id="lum-upd-date" class="text-muted">Last updated never</small></p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  <!-- -->
+		
+	  <!-- Soil temperature 1 card -->
+	  <div class="col-sm-12 card-stl">
+		<div class="card bg-light text-dark">
+		  <div class="row g-0">
+			<div class="col-md-4">
+			  <img src="/images/soiltemp.jpg" class="img-style">
+			</div>
+			<div class="col-md-8">
+			  <div class="card-body">
+			  <!-- card dropdown -->
+			  
+			  <div class="dropdown" style="position:absolute;right:0;top:0;">
+				  <a class="btn btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  </a>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="#">Last 7 days</a>
+					<a class="dropdown-item" href="#">Last 30 days</a>
+					<a class="dropdown-item" href="#">Last 90 days</a>
+					<a class="dropdown-item" href="#">Sensor info</a>
+				  </div>
+				</div>
+			  
+			  <!-- -->
+				<h5 class="card-title">Soil temperature 1</h5>
+				<p id="soil-temp-value-1" class="card-text">Unknown</p>
+				<p class="card-text"><small id="soil-temp-1-upd-date" class="text-muted">Last updated never</small></p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  <!-- -->
+	  
+	  <!-- Soil temperature 2 card -->
+	  <div class="col-sm-12 card-stl">
+		<div class="card bg-light text-dark">
+		  <div class="row g-0">
+			<div class="col-md-4">
+			  <img src="/images/soiltemp.jpg" class="img-style">
+			</div>
+			<div class="col-md-8">
+			  <div class="card-body">
+			  <!-- card dropdown -->
+			  
+			  <div class="dropdown" style="position:absolute;right:0;top:0;">
+				  <a class="btn btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  </a>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="#">Last 7 days</a>
+					<a class="dropdown-item" href="#">Last 30 days</a>
+					<a class="dropdown-item" href="#">Last 90 days</a>
+					<a class="dropdown-item" href="#">Sensor info</a>
+				  </div>
+				</div>
+			  
+			  <!-- -->
+				<h5 class="card-title">Soil temperature 2</h5>
+				<p id="soil-temp-value-2" class="card-text">Unknown</p>
+				<p class="card-text"><small id="soil-temp-2-upd-date" class="text-muted">Last updated never</small></p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  <!-- -->
+		
+	  <!-- Soil humidity 1 card -->
+	  <div class="col-sm-12 card-stl">
+		<div class="card text-white bg-primary">
+		  <div class="row g-0">
+			<div class="col-md-4">
+			  <img src="/images/soilhum.jpg" class="img-style">
+			</div>
+			<div class="col-md-8">
+			  <div class="card-body">
+			  <!-- card dropdown -->
+			  
+			  <div class="dropdown" style="position:absolute;right:0;top:0;">
+				  <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  </a>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="#">Last 7 days</a>
+					<a class="dropdown-item" href="#">Last 30 days</a>
+					<a class="dropdown-item" href="#">Last 90 days</a>
+					<a class="dropdown-item" href="#">Sensor info</a>
+				  </div>
+				</div>
+			  
+			  <!-- -->
+				<h5 class="card-title">Soil humidity 1</h5>
+				<p id="soil-hum-value-1" class="card-text">Unknown</p>
+				<p class="card-text"><small id="soil-hum-1-upd-date">Last updated never</small></p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+      </div>
+	  <!-- -->
+		
+	<!-- Soil humidity 2 card -->
+	<div class="col-sm-12 card-stl">
+		<div class="card text-white bg-primary">
+		  <div class="row g-0">
+			<div class="col-md-4">
+			  <img src="/images/soilhum.jpg" class="img-style">
+			</div>
+			<div class="col-md-8">
+			  <div class="card-body">
+			  <!-- card dropdown -->
+			  
+			  <div class="dropdown" style="position:absolute;right:0;top:0;">
+				  <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				  </a>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+					<a class="dropdown-item" href="#">Last 7 days</a>
+					<a class="dropdown-item" href="#">Last 30 days</a>
+					<a class="dropdown-item" href="#">Last 90 days</a>
+					<a class="dropdown-item" href="#">Sensor info</a>
+				  </div>
+				</div>
+			  
+			  <!-- -->
+				<h5 class="card-title">Soil humidity 2</h5>
+				<p id="soil-hum-value-2" class="card-text">Unknown</p>
+				<p class="card-text"><small id="soil-hum-2-upd-date">Last updated never</small></p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  <!-- -->
+	  
+	  </div>
+	</div>
+
+	<div class="card" style="margin:3%;">
+		<div class="row" style="margin: auto;padding-top: 50px;width:90%;">
+	
+			<!--Pump -->
+			<div class="col-sm-12 card-stl">
+				<div class="card text-dark bg-light">
+				<div class="row g-0">
+					<div class="col-md-4">
+	
+					</div>
+					<div class="col-md-8">
+					<div class="card-body">
+						<h5 class="card-title">Water pump</h5>
+						<p id="device-10-s" class="card-text"></p>
+						<button id="device-10" class="devicebtn btn"></button>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			<!-- -->
+
+			<!--LED -->
+			<div class="col-sm-12 card-stl">
+				<div class="card text-dark bg-light">
+				<div class="row g-0">
+					<div class="col-md-4">
+					
+					</div>
+					<div class="col-md-8">
+					<div class="card-body">
+						<h5 class="card-title">LED Lint</h5>
+						<p id="device-11-s" class="card-text"></p>
+						<button id="device-11" class="devicebtn btn"></button>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			<!-- -->
+
+			<!--SERVO -->
+			<div class="col-sm-12 card-stl">
+				<div class="card text-dark bg-light">
+				<div class="row g-0">
+					<div class="col-md-4">
+					
+					</div>
+					<div class="col-md-8">
+					<div class="card-body">
+						<h5 class="card-title">Servo</h5>
+						<p id="device-12-s" class="card-text"></p>
+						<button id="device-12" class="devicebtn btn"></button>
+					</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			<!-- -->
+
+
+		</div>
+	</div>
+	
+	
+		
+    </body>
+	<script>
+	$( document ).ready(function() {
+    	setInterval(function(){ 
+            updateValues() //function on page loaded which updates db records each 3sec
+            }, 3000);
+		setInterval(function(){ 
+		    updateDeviceStatuses()
+            }, 3000);
+		setInterval(function(){ 
+		    updateGreenhouseStatus()
+            }, 1000);
+	});
+
+    $('#user_logout').on('click', function () {
+        $.ajax({
+            url: '/api/logout',
+			type: 'POST',
+            data: {examp:"example"},
+            dataType : 'json',
+			success: function(data) { 
+                  alert("Success. You will be logged out");
+                  window.location = "/";
+                  },
+                error: function() {
+                   console.log('Can not log out. Try a bit later.');
+                  }
+			
+        });
+    });
+
+	$('.devicebtn').on('click', function () {
+        $.ajax({
+            url: '/api/changedevicestatus',
+			type: 'POST',
+            data: {id: $(this).attr('id').replace('device-','')},
+            dataType : 'json',
+			success: function(data) { 
+				updateDeviceStatuses();
+                  },
+                error: function() {
+                   console.log('Can not turn device.');
+                  }
+			
+        });
+    });
+
+	</script>
+
+    
+</html>
+

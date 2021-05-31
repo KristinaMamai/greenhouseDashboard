@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Log In</title>
+  </head>
+  <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <div class="card">
+		  <ul class="nav nav-pills nav-fill">
+				  <li class="nav-item">
+					  <a class="nav-link" aria-current="page" href="/dashboard">Dashboard</a>
+				  </li>
+				  <li class="nav-item">
+					 <a class="nav-link" href="/settings">Settings</a>
+				   </li>
+				   <li class="nav-item">
+					 <a class="nav-link" href="" id="user_logout">Log Out</a>
+				  </li>
+
+			 </ul>
+</div>
+
+<div class="row" style="margin: auto;">
+    <div class="card mt-2" style="width: 40%;margin-left: 2.5%">
+    <!--add new user form. Do nothing now-->
+    <form id="addnewform">
+      <div id="newuser" style="padding: 3%;">
+
+        <div class="card-body">
+            <h5 class="card-title">Register new user</h5>
+            <div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" placeholder="Username" id="newusername">
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" placeholder="Password" id="newpassword">
+                </div>
+                <div>
+                    <input type="text" class="form-control mb-3" placeholder="Auth key" id="newauthkey">
+                </div>
+            </div>
+            <div class="row">
+            <button type="submit" class="btn btn-primary" style="margin-left: 3%;" id="sbmtbtn">Submit</button>
+            <button class="btn btn-success" style="margin-left: 3%;">Generate auth key</button>
+        </div>
+        </div>
+
+      </div>
+    </form>
+
+    </div>
+
+    <div class="card ml-3 mt-2" style="width: 40%">
+        <div class="card-body">
+            <h5 class="card-title">User List</h5>
+            <div id="all_users">
+            <!--users here-->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+  
+<script>  
+    $(document).ready(function () {
+        updateUsersList();
+
+      // create new user
+        $("#addnewform").submit(function(e) {
+
+            e.preventDefault();
+
+            var user = $("#newusername").val();
+            var pass = $("#newpassword").val();
+            var auth = $("#newauthkey").val();
+
+            $.ajax({
+                url:'/api/createnewuser', 
+                type: 'POST',
+                data: {"username":user,"password":pass, "auth":auth},
+                success: function(data) { 
+                  if (data["status"] == "success"){
+                      alert("Success. User: "+ user + " added");
+                      updateUsersList();
+                  }else{
+                      alert("Cannot add user");
+                  }
+                },
+                error  : function() {
+                   console.log('error');
+                  }
+                });
+
+
+            });
+                });
+
+    //logout
+    $('#user_logout').on('click', function () {
+        $.ajax({
+            url: '/api/logout',
+			type: 'POST',
+            data: {examp:"example"},
+            dataType : 'json',
+			success: function(data) { 
+                  alert("Success. You will be logged out");
+                  window.location = "/";
+                  },
+                error: function() {
+                   console.log('Can not log out. Try a bit later.');
+                  }
+			
+        });
+    });
+
+    function updateUsersList(){
+        $.ajax({
+            url: '/api/getusers',
+			type: 'POST',
+            data: {examp:"example"},
+            dataType : 'json',
+			success: function(data) { 
+                //make user list empty
+                $("#all_users").empty();
+                values = data["data"];  
+                //console.log(values);
+                for (var i = 0;i<values.length;i++){
+                    //gen user card
+                    $('#all_users').append(
+                        '<div class="card w-75 m-auto p-3">'+
+                            '<div class="card-body">'+
+                                '<p id="hum-value" class="card-text"><b>Username: </b><u>'+values[i]['username']+'</u></p>'+
+                                '<p id="hum-value" class="card-text"><b>Auth key: </b><u>'+values[i]['auth_key']+'</u></p>'+
+                                '<button class="btn btn-danger" id="user_'+values[i]['id']+'">Delete</button>'+
+                            '</div>'+
+                        '</div>'
+                        ); 
+                        //add triger on button to delete user
+                        $('#user_'+values[i]['id']).on('click', function () {
+                                                $.ajax({
+                                                    url: '/api/deleteuser',
+                                                    type: 'POST',
+                                                    data: {"user_id": $(this).attr('id').replace('user_','')},
+                                                    dataType : 'json',
+                                                    success: function(data) { 
+                                                        alert("Success. User deleted");
+                                                        updateUsersList();
+                                                        },
+                                                        error: function() {
+                                                        console.log('Can not delete user.');
+                                                        }
+                                                    
+                                                });
+                                            });
+                       
+                }
+                },
+                error: function() {
+                   console.log('Can not get user list. Try a bit later.');
+                  }
+			
+        });
+    }
+</script>
+
+</body>
+</html>

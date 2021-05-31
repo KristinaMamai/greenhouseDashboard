@@ -1,0 +1,88 @@
+  <!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" /
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Log In</title>
+  </head>
+  <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- navbar -->
+  <div class="card">
+		  <ul class="nav nav-pills nav-fill">
+				  <li class="nav-item">
+					  <a class="nav-link disabled" aria-current="page" href="/dashboard">Dashboard</a>
+				  </li>
+				  <li class="nav-item">
+					 <a class="nav-link disabled" href="/settings">Settings</a>
+				   </li>
+				   <li class="nav-item">
+					 <a class="nav-link" href="/dashboard">Log In</a>
+				  </li>
+
+			 </ul>
+</div>
+
+<!-- login form -->
+<div class="card" style="width: 80%;margin: 5% auto;padding: 5%;">
+    <form id="loginform">
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Login</label>
+          <input type="text" class="form-control" id="loginid" aria-describedby="emailHelp">
+          <div id="emailHelp" class="form-text"></div>
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <input type="password" class="form-control" id="passid">
+        </div>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="exampleCheck1">
+          <label class="form-check-label" for="exampleCheck1">Check me out</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+
+    </div>
+<script>  
+    $(document).ready(function () {
+      // login function
+        $("#loginform").submit(function(e) {
+
+            e.preventDefault(); 
+            var user = $("#loginid").val();
+            var pass = $("#passid").val();
+
+            $.ajax({
+                url:'/api/login',   
+                type: 'POST',
+                data: {"username":user,"pass":pass},
+                success: function(data) { 
+                  if (data["status"] == "success"){
+                      alert("Success. You will be redirected to dashboard");
+                      if (data["data"][0]["is_super"]){
+                          window.location = "/admin"    
+                      }else{ window.location = "/dashboard"; }
+                  }else{
+                      alert("Wrong username or password");
+                  }
+                },
+                error  : function() {
+                   console.log('error');
+                  }
+                });
+
+
+            });
+                });
+
+</script>
+
+</body>
+</html>
